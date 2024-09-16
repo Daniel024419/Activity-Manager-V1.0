@@ -9,27 +9,27 @@
          <ul class="nav">
              <li class="active">
                  <a href="{{ route('admin.dashboard.home') }}">
-                     <i class="pe-7s-graph"></i>
+                     <i class="fa fa-home"></i>
                      <p>Dashboard</p>
                  </a>
              </li>
 
              <li>
                  <a href="{{ route('admin.activity.dashboard.home') }}">
-                     <i class="pe-7s-note2"></i>
+                     <i class="fa fa-tasks"></i>
                      <p>Activity List</p>
                  </a>
              </li>
 
              <li>
                  <a href="{{ route('admin.dashboard.users') }}">
-                     <i class="pe-7s-user"></i>
+                     <i class="fa fa-users"></i>
                      <p>Users</p>
                  </a>
              </li>
              <li>
                  <a href="{{ route('admin.dashboard.profile.index') }}">
-                     <i class="pe-7s-user"></i>
+                     <i class="fa fa-user"></i>
                      <p>User Profile</p>
                  </a>
              </li>
