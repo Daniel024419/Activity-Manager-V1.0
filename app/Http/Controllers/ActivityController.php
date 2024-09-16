@@ -16,17 +16,11 @@ class ActivityController extends Controller
      */
     public function index(Request $request)
     {
-        $userId = $request->user(guard: 'users')->id;
-        $updates = Update::with('activity')
-            ->where('user_id', $userId)
-            ->get();
-
-
-        $activities = Activity::all();
-
+        // $activities = Activity::where('created_by', $request->user('users')->id)->get();
+        $activities = Activity::paginate(10);
         return view(
             'dashboard.users.activities.index',
-            ['activities' => $activities, 'updates' => $updates]
+            ['activities' => $activities]
         );
     }
 

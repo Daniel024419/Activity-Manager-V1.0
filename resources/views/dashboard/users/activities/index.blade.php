@@ -38,7 +38,7 @@
                             <div class="card">
                                 <div class="header">
                                     @include('dashboard.alerts.alert')
-                                    <h4 class="title">Activities ({{ count($activities) }})</h4>
+                                    <h4 class="title">Activities ({{ $activities->total() }})</h4>
                                     <!-- Button to open modal -->
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
                                         data-target="#createActivity">
@@ -88,12 +88,14 @@
                                         </tbody>
                                     </table>
 
+                                    <!-- Pagination Links -->
+                                    <div class="pagination-container">
+                                        {{ $activities->links() }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
 
                 </div>
             </div>
@@ -146,7 +148,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="description">Activity</label>
-                            <input type="text" readonly class="form-control" id="description" name="description">
+                            <input type="text" readonly class="form-control" id="description_view" name="description_view">
                         </div>
 
                         <div class="form-group">
@@ -180,20 +182,16 @@
 
 </body>
 
-
 <script>
      function changeActivityStatus(data) {
-
-        document.getElementById('description').value = '';
+        
+        document.getElementById('description_view').value = '';
         document.getElementById('activity_id').value = '';
 
         // Populate the form with the new data
-        document.getElementById('description').value = data.description;
+        document.getElementById('description_view').value = data.description;
         document.getElementById('activity_id').value = data.id;
     }
 </script>
-
-
-
 
 </html>

@@ -33,7 +33,7 @@
                             <div class="card">
                                 <div class="header">
                                     @include('dashboard.alerts.alert')
-                                    <h4 class="title">Users ({{ count($users) }})</h4>
+                                    <h4 class="title">Users ({{ $users->total() }})</h4>
 
                                     <span>
 
@@ -71,11 +71,13 @@
                                                     <td>{{ Str::ucfirst($user->name) }}</td>
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $user->role->name ?? 'N/A' }}</td>
-                                                    <td>{{ $user->createdByUser ? Str::ucfirst($user->createdByUser->name) : 'N/A' }}</td>
+                                                    <td>{{ $user->createdByUser ? Str::ucfirst($user->createdByUser->name) : 'N/A' }}
+                                                    </td>
                                                     <td>{{ $user->created_at }}</td>
                                                     <td>
                                                         <a href="#" class="btn btn-primary">Edit</a>
-                                                        <a href="{{ route('admin.dashboard.delete.user', $user->id) }}" onclick="return confirmDelete(event);"
+                                                        <a href="{{ route('admin.dashboard.delete.user', $user->id) }}"
+                                                            onclick="return confirmDelete(event);"
                                                             class="btn btn-danger">Delete</a>
                                                     </td>
                                                 </tr>
@@ -83,7 +85,9 @@
                                         </tbody>
                                     </table>
 
-
+                                    <div class="pagination-container">
+                                        {{ $users->links() }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
