@@ -47,24 +47,21 @@
                         <div class="col-md-8">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">Activity Status</h4>
-                                    <p class="category">Current Updates and Remarks</p>
+                                    <h4 class="title">Reports</h4>
+                                    <p class="category">Custom Activity Histories</p>
                                 </div>
                                 <div class="content">
-                                    <div id="activityStatus" class="ct-chart"></div>
+                                    <div id="reportView" class="ct-chart"></div>
                                     <div class="footer">
-                                        <div class="legend">
-                                            <i class="fa fa-circle text-info"></i> Done
-                                            <i class="fa fa-circle text-danger"></i> Pending
-                                        </div>
-                                        <hr>
                                         <div class="stats">
-                                            <i class="fa fa-history"></i> Last update 5 minutes ago
+                                            <i class="fa fa-calendar"></i> Custom date range selected
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
 
                     <div class="row">
@@ -102,6 +99,10 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
+
+                                        <div class="pagination-container">
+                                            {{ $activities->links() }}
+                                        </div>
                                     </div>
                                     <div class="footer">
                                         <hr>
@@ -116,19 +117,26 @@
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">Reports</h4>
-                                    <p class="category">Custom Activity Histories</p>
+                                    <h4 class="title">Activity Status</h4>
+                                    <p class="category">Current Updates and Remarks</p>
                                 </div>
                                 <div class="content">
-                                    <div id="reportView" class="ct-chart"></div>
+                                    <div id="activityStatus" class="ct-chart"></div>
                                     <div class="footer">
+                                        <div class="legend">
+                                            <i class="fa fa-circle text-info"></i> Done
+                                            <i class="fa fa-circle text-danger"></i> Pending
+                                        </div>
+                                        <hr>
                                         <div class="stats">
-                                            <i class="fa fa-calendar"></i> Custom date range selected
+                                            <i class="fa fa-history"></i> Last update 5 minutes ago
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -166,7 +174,7 @@
 
         // Initialize Reports Chart
         new Chartist.Line('#reportView', {
-            labels: reports.labels,
+            // labels: reports.labels,
             series: reports.series
         });
     </script>

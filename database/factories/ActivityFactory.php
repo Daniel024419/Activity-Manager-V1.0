@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Activity;
+use Carbon\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Activity>
@@ -26,7 +27,8 @@ class ActivityFactory extends Factory
     {
         return [
             'description' => $this->faker->sentence, // Generates a random sentence as activity description
-            'created_by' => rand(1, 2)
+            'created_by' => rand(1, 2),
+            'created_at' => now()->addMonths(rand(1, 5)),
         ];
     }
 }

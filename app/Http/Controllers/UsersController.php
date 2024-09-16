@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User as UserModel;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -11,7 +12,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = \App\Models\User::all();
+        $users = UserModel::paginate(10);
         return view('dashboard.users.index', ['users' => $users]);
     }
 

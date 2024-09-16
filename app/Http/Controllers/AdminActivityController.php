@@ -15,11 +15,9 @@ class AdminActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index( Request $request )
     {
-
-        $activities = Activity::all();
-
+        $activities = Activity::paginate(10);
         return view('dashboard.admins.activities.index', 
         ['activities' => $activities]);
     }

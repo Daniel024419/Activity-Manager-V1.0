@@ -16,6 +16,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+
 
 class AdminDashboardController extends Controller
 {
@@ -25,16 +28,16 @@ class AdminDashboardController extends Controller
     public function index()
     {
         // Fetch all activities with updates and associated users
-        $activities = Activity::with('updates.user')->get();
+        $activities = Activity::paginate(5);
 
         // Prepare data for SMS Count Chart
-        $smsCounts = $this->getSmsCounts();
+        $smsCounts = $this->getActivityCounts( Activity::latest()->get() );
 
         // Prepare data for Activity Status Chart
         $activityStatus = $this->getActivityStatus($activities);
 
         // Prepare data for Reports Chart
-        $reports = $this->getReports();
+        $reports = $this->getReports(Activity::all() );
 
         return view('dashboard.admins.index', compact('activities', 'smsCounts', 'activityStatus', 'reports'));
     }
@@ -44,13 +47,20 @@ class AdminDashboardController extends Controller
      *
      * @return array
      */
-    private function getSmsCounts()
+    private function getActivityCounts( $activities )
     {
-        // Sample implementation; replace with actual data retrieval
-        // Fetching SMS count data based on your application's logic
+        // Initialize an array to hold counts for each day of the week
+        $groupedActivities = $activities->groupBy(fn ($activity) => Carbon::parse($activity->created_at)->format('l'));
+        $smsCounts = $groupedActivities->map(fn ($activities) => $activities->sum(fn ($activity) => $activity->updates->count()));
+
+        $smsCountsData = $smsCounts->map(fn ($count, $day) => [
+            'label' => $day,
+            'value' => $count,
+        ])->toArray();
+
         return [
-            'labels' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            'series' => [[12, 9, 7, 8, 5]] // Replace with real data
+            'labels' => array_column($smsCountsData, 'label'),
+            'series' => [array_column($smsCountsData, 'value')],
         ];
     }
 
@@ -63,23 +73,19 @@ class AdminDashboardController extends Controller
     private function getActivityStatus($activities)
     {
         // Initialize counters
-        $statuses = ['done' => 0, 'pending' => 0];
+        $statusCounts = ['done' => 0, 'pending' => 0];
 
-        // Count activities based on status
         foreach ($activities as $activity) {
             foreach ($activity->updates as $update) {
-                if (isset($statuses[$update->status])) {
-                    $statuses[$update->status]++;
+                if (array_key_exists($update->status, $statusCounts)) {
+                    $statusCounts[$update->status]++;
                 }
             }
         }
 
         return [
             'labels' => ['Done', 'Pending'],
-            'series' => [[
-                $statuses['done'],
-                $statuses['pending']
-            ]]
+            'series' => [array_values($statusCounts)]
         ];
     }
 
@@ -88,30 +94,68 @@ class AdminDashboardController extends Controller
      *
      * @return array
      */
-    private function getReports()
+    private function getReports($activities)
     {
-        // Sample implementation; replace with actual data retrieval
-        // Fetching reports data based on your application's logic
+
+        // dd($activities);
+        // Initialize an array to hold the counts for each day
+        $dailyCounts = [];
+
+        // Iterate over the activities
+        foreach ($activities as $activity) {
+            // Get the date of the activity
+            $date = Carbon::parse($activity->created_at)->format('Y-m-d'); // Format date as 'YYYY-MM-DD'
+
+            // If the date is not already in the array, initialize it
+            if (!isset($dailyCounts[$date])) {
+                $dailyCounts[$date] = 0;
+            }
+
+            // Increment the count for the date
+            $dailyCounts[$date]++;
+        }
+
+        // Sort the dates to ensure chronological order
+        ksort($dailyCounts);
+
+        // Prepare the data for the report
+        $labels = array_keys($dailyCounts);
+        $series = [array_values($dailyCounts)];
+
         return [
-            'labels' => ['January', 'February', 'March', 'April', 'May'],
-            'series' => [[4, 6, 3, 9, 7]] // Replace with real data
+            'labels' => $labels,
+            'series' => $series
         ];
     }
+
 
     /**
      * Display a listing of all users (both regular users and admins).
      *
+     * @return \Illuminate\Contracts\View\View
      */
     public function users()
     {
-        $allUsers = [...User::all(), ...Admin::all()];
-        return view(
-            'dashboard.admins.users.index',
-            [
-                'users' => $allUsers,
-                'roles' => Roles::all()
-            ]
+        $users = User::all();
+        $admins = Admin::all();
+
+        $allUsers = $users->merge($admins);
+
+        $currentPage = Paginator::resolveCurrentPage();
+        $perPage = 10;
+
+        $paginatedItems = new LengthAwarePaginator(
+            $allUsers->slice(($currentPage - 1) * $perPage, $perPage)->all(),
+            $allUsers->count(),
+            $perPage,
+            $currentPage,
+            ['path' => Paginator::resolveCurrentPath()]
         );
+
+        return view('dashboard.admins.users.index', [
+            'users' => $paginatedItems,
+            'roles' => Roles::all()
+        ]);
     }
 
     public function exportUsers()

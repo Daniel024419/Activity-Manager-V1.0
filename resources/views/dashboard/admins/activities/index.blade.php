@@ -78,7 +78,7 @@
                             <div class="card">
                                 <div class="header">
                                     @include('dashboard.alerts.alert')
-                                    <h4 class="title">Activities ( {{ count($activities) }} ) </h4>
+                                    <h4 class="title">Activities ( {{ $activities->total() }} ) </h4>
                                     <p class="category">Daily Updates and Remarks</p>
                                     <!-- Button to open modal -->
 
@@ -129,6 +129,10 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+
+                                    <div class="pagination-container">
+                                        {{ $activities->links() }}
+                                    </div>
 
                                 </div>
                             </div>
