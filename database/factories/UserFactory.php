@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'role_id' => Roles::inRandomOrder()->where('name', \App\Enums\Roles::USER->value)->first()->id,
             'password' => 'password',
             'remember_token' => Str::random(10),
+            'created_by' => rand(1, 2)
         ];
     }
 

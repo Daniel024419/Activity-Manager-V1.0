@@ -37,9 +37,10 @@
                             <div class="card">
                                 <div class="header">
                                     <h4 class="title">Activities Report</h4>
-                                    <p class="category">From {{ $startDate->format('d/m/Y') }} to {{ $endDate->format('d/m/Y') }}</p>
+                                    <p class="category">From {{ $startDate->format('d/m/Y') }} to
+                                        {{ $endDate->format('d/m/Y') }}</p>
                                 </div>
-                                <div class="content table-responsive table-full-width">
+                                <div style="padding: 30px" class="content table-responsive table-full-width">
                                     <table id="activitiesTable" class="table table-hover table-striped">
                                         <thead>
                                             <tr>
@@ -49,6 +50,7 @@
                                                 <th>Remark</th>
                                                 <th>Personnel</th>
                                                 <th>Time</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -61,18 +63,24 @@
                                                         <td>{{ $update->remark }}</td>
                                                         <td>{{ $update->user->name }}</td>
                                                         <td>{{ $update->manual_updated_at }}</td>
+                                                        <td>
+                                                            <a href="{{ route('admin.activity.dashboard.download', $activity->id) }}"
+                                                                class="btn btn-primary">
+                                                                <i class="fa fa-download"></i>  Updates
+                                                            </a>
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             @endforeach
                                         </tbody>
                                     </table>
 
-                                    <div class="footer">
+                                    {{-- <div class="footer">
                                         <hr>
-                                        <a href="{{ route('admin.activity.download') }}" class="btn btn-primary">
+                                        <a href="{{ route('admin.activity.dashboard.download') }}" class="btn btn-primary">
                                             <i class="fa fa-download"></i> Download Report
                                         </a>
-                                    </div>
+                                    </div> --}}
 
                                 </div>
                             </div>
@@ -89,14 +97,6 @@
 
     @include('dashboard.admins.includes.script')
 
-    <!-- DataTables JS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#activitiesTable').DataTable();
-        });
-    </script>
 </body>
 
 </html>

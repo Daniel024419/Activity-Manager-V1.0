@@ -26,6 +26,7 @@ class AdminFactory extends Factory
             'role_id' => Roles::where('name', \App\Enums\Roles::ADMIN->value)->first()->id,
             'password' => 'password',
             'remember_token' => Str::random(10),
+            'created_by' => rand(1, 2)
         ];
     }
 

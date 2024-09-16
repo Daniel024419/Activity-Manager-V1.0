@@ -29,13 +29,13 @@
                         <div class="col-md-8">
                             <div class="card">
                                 <div class="header">
-                                    @include('dashboard.alerts.alert')
+                                     @include('dashboard.alerts.alert')
                                     <h4 class="title">Edit Profile</h4>
                                 </div>
                                 <div class="content">
-                                    <form method="POST" autocomplete="false" action="{{ route('admin.dashboard.profile.update') }}"
-                                        enctype="multipart/form-data" method="POST">
+                                    <form action="{{ route('admin.dashboard.profile.update') }}" enctype="multipart/form-data" method="POST">
                                         @csrf
+                                        @method('PUT')
 
                                         <div class="row">
                                             <div class="col-md-6">
@@ -57,24 +57,17 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Password</label>
-                                                    <input type="password" class="form-control" name="password"
-                                                        placeholder="Password">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
                                                     <label>Role</label>
-                                                    <input type="role" class="form-control" readonly disabled
-                                                        name="" value="{{ auth()->user()->role->name }}"
-                                                        id="">
+                                                    <select class="form-control" name="role_id">
+                                                        @foreach ($roles as $role)
+                                                            <option value="{{ $role->id }}"
+                                                                {{ auth()->user()->role_id == $role->id ? 'selected' : '' }}>
+                                                                {{ $role->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
-
-                                            <input type="hidden" class="form-control" name="user_id"
-                                                value="{{ auth()->user()->id }}" id="">
-
                                         </div>
 
                                         <button type="submit" class="btn btn-info btn-fill pull-right">Update
@@ -90,7 +83,7 @@
                                 <div class="image">
                                     <img src="https://ununsplash.imgix.net/photo-1431578500526-4d9613015464?fit=crop&fm=jpg&h=300&q=75&w=400"
                                         alt="..." />
-                                </div>
+                                </div> 
                                 <hr>
                                 <div class="text-center">
                                     <button href="#" class="btn btn-simple"><i

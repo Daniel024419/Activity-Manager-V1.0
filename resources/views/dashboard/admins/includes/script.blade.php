@@ -17,26 +17,62 @@
 <!-- Light Bootstrap Table DEMO methods, don't include it in your project! -->
 <script src="{{ asset('js/demo.js') }}"></script>
 
-<script type="text/javascript">
-    $(document).ready(function(){
-        demo.initChartist();
+<!-- DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#activitiesTable').DataTable();
+    });
 
-        $.notify({
-            icon: 'pe-7s-gift',
-            message: "Welcome to <b>Light Bootstrap Dashboard</b> - a beautiful freebie for every web developer."
-
-        },{
-            type: 'info',
-            timer: 4000
-        });
+    $(document).ready(function() {
+        $('#usersTable').DataTable();
     });
 </script>
 
-    <!-- DataTables JS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#activitiesTable').DataTable();
+<script>
+    // Automatically hide the alert after 2 seconds
+    window.setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            alert.style.display = 'none';
         });
-    </script>
+    }, 5000); // 2000 milliseconds = 2 seconds
+
+    function confirmLogout(event) {
+        event.preventDefault(); // Prevent the default behavior (i.e., navigating to the link)
+
+        // Show confirmation dialog
+        var userConfirmed = confirm("Are you sure you want to log out?");
+
+        // If the user confirms, proceed with the logout
+        if (userConfirmed) {
+            // Get the href attribute from the event's target
+            var href = event.currentTarget.getAttribute('href');
+            // Redirect to the href
+            window.location.href = href;
+        }
+
+        // If the user cancels, do nothing (this will stop the logout)
+        return false;
+    }
+
+
+    function confirmDelete(event) {
+        event.preventDefault(); // Prevent the default behavior (i.e., navigating to the link)
+
+        // Show confirmation dialog
+        var userConfirmed = confirm("Are you sure you want to delete this?");
+
+        // If the user confirms, proceed with the logout
+        if (userConfirmed) {
+            // Get the href attribute from the event's target
+            var href = event.currentTarget.getAttribute('href');
+            // Redirect to the href
+            window.location.href = href;
+        }
+
+        // If the user cancels, do nothing (this will stop the logout)
+        return false;
+    }
+</script>

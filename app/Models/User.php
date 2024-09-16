@@ -23,7 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role_id',
-        'createdBy',
+        'created_by',
     ];
 
     /**
@@ -80,7 +80,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function createdByUser()
     {
-        return $this->belongsTo(User::class, 'createdBy', 'id');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     /**

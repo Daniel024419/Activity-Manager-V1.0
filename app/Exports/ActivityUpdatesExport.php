@@ -3,15 +3,29 @@
 namespace App\Exports;
 
 use App\Models\Activity;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 
 class ActivityUpdatesExport implements FromCollection, WithHeadings
 {
+
+    protected $id;
+
+    // Constructor to accept and assign the ID
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+   
     public function collection()
     {
-        return Activity::with('updates.user')->get()->flatMap(function ($activity) {
+        return Activity::where('id',$this->id)->with('updates.user')->get()->flatMap(function ($activity) {
             return $activity->updates->map(function ($update) use ($activity) {
                 return [
                     'ID' => $update->id,
@@ -19,7 +33,7 @@ class ActivityUpdatesExport implements FromCollection, WithHeadings
                     'Status' => $update->status,
                     'Remark' => $update->remark,
                     'Personnel' => $update->user->name,
-                    'Time' => $update->manual_updated_at->format('d/m/Y H:i'),
+                    'Time' => Carbon::parse($update->manual_updated_at)->format('d/m/Y H:i'),
                 ];
             });
         });

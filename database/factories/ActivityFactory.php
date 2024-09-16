@@ -26,6 +26,7 @@ class ActivityFactory extends Factory
     {
         return [
             'description' => $this->faker->sentence, // Generates a random sentence as activity description
+            'created_by' => rand(1, 2)
         ];
     }
 }

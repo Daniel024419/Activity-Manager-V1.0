@@ -37,38 +37,50 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="header">
-                                       <h4 class="title">Your Updates</h4>
-                        <p class="category">Reports on Activities You Updated</p>
+                                    @include('dashboard.alerts.alert')
+                                    <h4 class="title">Activities ({{ count($activities) }})</h4>
                                     <!-- Button to open modal -->
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#activityModal">
+                                        data-target="#createActivity">
                                         Add New Activity
                                     </button>
                                 </div>
-                                <div class="content table-responsive table-full-width">
+                                <div style="padding: 30px" class="content table-responsive table-full-width">
                                     <table id="activitiesTable" class="table table-hover table-striped">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Activity Description</th>
-                                                <th>Status</th>
-                                                <th>Remark</th>
-                                                <th>Personnel</th>
-                                                <th>Time</th>
+                                                <th>Description</th>
+                                                <th>Updates</th>
+                                                <th>Created By</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
 
-                                            @foreach ($updates as $update)
+                                            @foreach ($activities as $activity)
                                                 <tr>
-                                                    <td>{{ $update->id }}</td>
-                                                    <td>{{ $update->activity->description }}</td>
-                                                    <td
-                                                        style="color: {{ $update->status === 'done' ? 'green' : 'black' }}">
-                                                        {{ Str::ucfirst($update->status) }}</td>
-                                                    <td>{{ $update->remark }}</td>
-                                                    <td>{{ $update->user->name }}</td>
-                                                    <td>{{ $update->manual_updated_at }}</td>
+                                                    <td>{{ $activity->id }}</td>
+                                                    <td>{{ $activity->description }}</td>
+                                                    <td> {{ $activity->updates->count() }} </td>
+                                                    <td>{{ $activity->createdByUser ? $activity->createdByUser->name : 'N/A' }}
+                                                    </td>
+                                                    <td>{{ $activity->created_at }}</td>
+
+                                                    <td>
+                                                        <a href="#" class="btn btn-primary" data-toggle="modal"
+                                                            data-target="#changeActivityStatus"
+                                                            data-id="{{ $activity->id }}"
+                                                            onclick="changeActivityStatus({{ json_encode($activity) }})"
+                                                            data-description="{{ $activity->description }}">
+                                                            Change Status
+                                                        </a>
+
+                                                         <a href="{{ route('users.dashboard.activity.show', $activity->id) }}"
+                                                            class="btn btn-primary">View</a>
+
+                                                    </td>
 
                                                 </tr>
                                             @endforeach
@@ -91,8 +103,7 @@
         </div>
     </div>
 
-    <!-- Modal for adding a new activity -->
-    <div class="modal fade" id="activityModal" tabindex="-1" role="dialog" aria-labelledby="activityModalLabel"
+        <div class="modal fade" id="createActivity" tabindex="-1" role="dialog" aria-labelledby="activityModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -102,27 +113,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('users.dashboard.activity.store') }}" method="POST">
+                <form action="{{ route('users.dashboard.activity.store') }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="description">Activity Description</label>
-                            <input type="text" class="form-control" id="description" name="description" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select class="form-control" id="status" name="status" required>
-                                <option value="pending">Pending</option>
-                                <option value="done">Done</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="remark">Remark</label>
-                            <textarea class="form-control" id="remark" name="remark" rows="3"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="personnel">Personnel</label>
-                            <input type="text" class="form-control" id="personnel" name="personnel" required>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -134,41 +131,69 @@
         </div>
     </div>
 
+    <div class="modal fade" id="changeActivityStatus" tabindex="-1" role="dialog"
+        aria-labelledby="changeActivityStatusLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeActivityStatusLabel">Change Activity Status</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('users.dashboard.activity.update.status') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="description">Activity</label>
+                            <input type="text" readonly class="form-control" id="description" name="description">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity_id">Activity ID</label>
+                            <input type="text" readonly class="form-control" id="activity_id" name="activity_id">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="remark">Remark</label>
+                            <textarea class="form-control" id="remark" name="remark" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="pending">Pending</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @include('dashboard.admins.includes.script')
 
-    <!-- DataTables JS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#activitiesTable').DataTable();
-        });
-
-
-        $('#saveActivityButton').click(function() {
-            $.ajax({
-                url: {{ route('users.dashboard.activity.store') }}, // Adjust this URL to your route
-                method: 'POST',
-                data: {
-                    activity_id: $('#activity_id').val(),
-                    user_id: $('#user_id').val(),
-                    status: $('#status').val(),
-                    remark: $('#remark').val(),
-                    manual_updated_at: $('#manual_updated_at').val(),
-                    createdBy: $('#createdBy').val(),
-                    _token: $('meta[name="csrf-token"]').attr('content') // CSRF Token
-                },
-                success: function(response) {
-                    alert(response.message);
-                    $('#updateModal').modal('hide'); // Close the modal
-                    location.reload(); // Optionally reload the page
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseJSON.message);
-                }
-            });
-        });
-    </script>
 </body>
+
+
+<script>
+     function changeActivityStatus(data) {
+
+        document.getElementById('description').value = '';
+        document.getElementById('activity_id').value = '';
+
+        // Populate the form with the new data
+        document.getElementById('description').value = data.description;
+        document.getElementById('activity_id').value = data.id;
+    }
+</script>
+
+
+
 
 </html>
