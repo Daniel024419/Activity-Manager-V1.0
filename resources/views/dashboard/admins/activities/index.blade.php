@@ -48,12 +48,14 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">Generate Report</h4>
+                                    <h4 class="title">Generate Filter</h4>
                                     <p class="category">Filter activities by date range</p>
                                 </div>
                                 <div class="content">
-                                    <form method="GET" action="{{ route('admin.activity.report') }}"
-                                        class="form-inline">
+                                    <form method="GET" enctype="multipart/form-data"
+                                        action="{{ route('admin.activity.dashboard.filter') }}" class="form-inline">
+
+                                        @csrf
                                         <div class="form-group">
                                             <label for="startDate" class="sr-only">Start Date</label>
                                             <input type="date" class="form-control" id="startDate" name="start_date"
@@ -64,7 +66,7 @@
                                             <input type="date" class="form-control" id="endDate" name="end_date"
                                                 required>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Generate Report</button>
+                                        <button type="submit" class="btn btn-primary">Generate</button>
                                     </form>
                                 </div>
                             </div>
@@ -75,56 +77,58 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="header">
-                                    @if (session('success'))
-                                        <div class="alert alert-success">
-                                            {{ session('success') }}
-                                        </div>
-                                    @endif
-                                    <h4 class="title">Activities List</h4>
+                                    @include('dashboard.alerts.alert')
+                                    <h4 class="title">Activities ( {{ count($activities) }} ) </h4>
                                     <p class="category">Daily Updates and Remarks</p>
                                     <!-- Button to open modal -->
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#activityModal">
-                                        Add New Activity
-                                    </button>
+
+                                    <span>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#activityModal">
+                                            Add New Activity
+                                        </button>
+
+                                        {{-- <a href="{{ route('admin.activity.dashboard.download') }}"
+                                            class="btn btn-primary">
+                                            <i class="fa fa-download"></i> Download Activities
+                                        </a> --}}
+                                    </span>
+
                                 </div>
-                                <div class="content table-responsive table-full-width">
+                                <div style="padding: 30px" class="content table-responsive table-full-width">
                                     <table id="activitiesTable" class="table table-hover table-striped">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
-                                                <th>Activity Description</th>
-                                                <th>Status</th>
-                                                <th>Remark</th>
-                                                <th>Personnel</th>
-                                                <th>Time</th>
+                                                <th>Description</th>
+                                                <th>Updates</th>
+                                                <th>Created By</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($activities as $activity)
-                                                @foreach ($activity->updates as $update)
-                                                    <tr>
-                                                        <td>{{ $update->id }}</td>
-                                                        <td>{{ $activity->description }}</td>
-                                                        <td
-                                                            style="color: {{ $update->status === 'done' ? 'green' : 'black' }}">
-                                                            {{ Str::ucfirst($update->status) }}</td>
-                                                        <td>{{ $update->remark }}</td>
-                                                        <td>{{ $update->user->name }}</td>
-                                                        <td>{{ $update->manual_updated_at }}</td>
+                                                <tr>
+                                                    <td>{{ $activity->id }}</td>
+                                                    <td>{{ $activity->description }}</td>
+                                                    <td> {{ $activity->updates->count() }} </td>
+                                                    <td>{{ $activity->createdByUser ? $activity->createdByUser->name : 'N/A' }}
+                                                    </td>
 
-                                                    </tr>
-                                                @endforeach
+                                                    <td>{{ $activity->created_at }}</td>
+                                                    <td>
+                                                        <a href="{{ route('admin.activity.dashboard.destroy', $activity->id) }}"
+                                                            onclick="return confirmDelete(event);"
+                                                            class="btn btn-danger">Delete</a>
+                                                        <a href="{{ route('admin.activity.dashboard.show', $activity->id) }}"
+                                                            class="btn btn-primary">View</a>
+                                                    </td>
+
+                                                </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
-
-                                    <div class="footer">
-                                        <hr>
-                                        <a href="{{ route('admin.activity.dashboard.download') }}" class="btn btn-primary">
-                                            <i class="fa fa-download"></i> Download Updates
-                                        </a>
-                                    </div>
 
                                 </div>
                             </div>
@@ -154,7 +158,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="{{ route('admin.activity.dashboard.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.activity.dashboard.store') }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">

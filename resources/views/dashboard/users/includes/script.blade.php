@@ -17,21 +17,6 @@
 <!-- Light Bootstrap Table DEMO methods, don't include it in your project! -->
 <script src="{{ asset('js/demo.js') }}"></script>
 
-<script type="text/javascript">
-    $(document).ready(function(){
-        demo.initChartist();
-
-        $.notify({
-            icon: 'pe-7s-gift',
-            message: "Welcome to <b>Light Bootstrap Dashboard</b> - a beautiful freebie for every web developer."
-
-        },{
-            type: 'info',
-            timer: 4000
-        });
-    });
-</script>
-
     <!-- DataTables JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -39,4 +24,23 @@
         $(document).ready(function() {
             $('#activitiesTable').DataTable();
         });
+
+
+           function confirmLogout(event) {
+        event.preventDefault(); // Prevent the default behavior (i.e., navigating to the link)
+
+        // Show confirmation dialog
+        var userConfirmed = confirm("Are you sure you want to log out?");
+
+        // If the user confirms, proceed with the logout
+        if (userConfirmed) {
+            // Get the href attribute from the event's target
+            var href = event.currentTarget.getAttribute('href');
+            // Redirect to the href
+            window.location.href = href;
+        }
+
+        // If the user cancels, do nothing (this will stop the logout)
+        return false;
+    }
     </script>

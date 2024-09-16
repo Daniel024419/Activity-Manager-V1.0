@@ -16,7 +16,7 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <!-- Bootstrap CSS -->
- </head>
+</head>
 
 <body>
 
@@ -91,7 +91,9 @@
                                                     @foreach ($activity->updates as $update)
                                                         <tr>
                                                             <td>{{ $activity->description }}</td>
-                                                            <td style="color: {{ $update->status === 'done' ? 'green' : 'black' }}">{{ ucfirst($update->status) }}</td>
+                                                            <td
+                                                                style="color: {{ $update->status === 'done' ? 'green' : 'black' }}">
+                                                                {{ ucfirst($update->status) }}</td>
                                                             <td>{{ $update->remark }}</td>
                                                             <td>{{ $update->user->name }}</td>
                                                             <td>{{ $update->manual_updated_at }}</td>
@@ -166,6 +168,21 @@
         new Chartist.Line('#reportView', {
             labels: reports.labels,
             series: reports.series
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            demo.initChartist();
+
+            $.notify({
+                icon: 'pe-7s-gift',
+                message: "Welcome Back <b>User</b> "
+
+            }, {
+                type: 'info',
+                timer: 3000
+            });
         });
     </script>
 </body>

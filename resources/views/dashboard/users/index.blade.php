@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="assets/img/favicon.ico">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-    <title>Activities Tracker | Profile</title>
+    <title>Activities Tracker | Dashboard</title>
 
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
@@ -114,5 +114,18 @@
     </div>
     @include('dashboard.admins.includes.script')
 </body>
+<script type="text/javascript">
+    $(document).ready(function(){
+        demo.initChartist();
 
+        $.notify({
+            icon: 'pe-7s-gift',
+            message: "Welcome Back <b>User</b> "
+
+        },{
+            type: 'info',
+            timer: 3000
+        });
+    });
+</script>
 </html>

@@ -36,6 +36,7 @@ Route::controller(UsersDashboardController::class)
     ->group(function () {
         Route::get('/home', 'index')->name('home');
         Route::get('/profile', 'profile')->name('profile');
+        Route::post('/profile/update', 'update')->name('profile.update');
     });
 
 Route::controller(ActivityController::class)
@@ -44,9 +45,18 @@ Route::controller(ActivityController::class)
     ->prefix('users/dashboard/activity')
     ->group(function () {
         Route::get('/', 'index')->name('home');
-        Route::get('/{id}', 'show')->name('show');
+        Route::get('/show/{id}', 'show')->name('show');
         Route::post('/{id}', 'update')->name('update');
         Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::post('/update-status', 'updateActivityStatus')->name('update.status');
+    });
+
+Route::controller(ActivityController::class)
+    ->middleware([UserAuthMiddleware::class])
+    ->name('users.dashboard.activity.')
+    ->prefix('users/activity')
+    ->group(function () {
+        Route::post('/update-status', 'updateActivityStatus')->name('update.status');
         Route::post('/store', 'store')->name('store');
     });
 
@@ -59,6 +69,10 @@ Route::controller(AdminDashboardController::class)
     ->group(function () {
         Route::get('/', 'index')->name('home');
         Route::get('/users', 'users')->name('users');
+        Route::post('/create-user', 'createUser')->name('create.user');
+        Route::get('/delete-user/{user}', action: 'deleteUser')->name('delete.user');
+        Route::get('/export-users', 'exportUsers')->name('export.users');
+        Route::get('/export-admins', 'exportAdmins')->name('export.admins');
     });
 
 Route::controller(AdminActivityController::class)
@@ -67,19 +81,27 @@ Route::controller(AdminActivityController::class)
     ->prefix('admin/activity/dashboard')
     ->group(function () {
         Route::get('/', 'index')->name('home');
-        Route::get('/{id}', 'show')->name('show');
-        Route::post('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-        Route::get('/download', 'download')->name('download');
-        Route::get('/report', 'report')->name('report');
+        Route::get('show/{id}', 'show')->name('show');
+        Route::post('/update/{id}', 'update')->name('update');
+        Route::get('/delete/{id}', 'destroy')->name('destroy');
         Route::post('/store', 'store')->name('store');
     });
 
-Route::controller(AdminProfileController::class)
+
+Route::controller(AdminActivityController::class)
+    ->name('admin.activity.dashboard.')
+    ->prefix('admin/activity')
+    ->group(function () {
+        Route::get('/report-filter', 'filter')->name('filter');
+        Route::get('/download/{id}', 'download')->name('download');
+    });
+
+
+Route::controller(controller: AdminProfileController::class)
     ->middleware([AdminAuthMiddleware::class])
     ->name('admin.dashboard.profile.')
-    ->prefix('admin/dashboard/profile')
+    ->prefix('admin/dashboard')
     ->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'update')->name('update');
+        Route::get('/profile', 'index')->name('index');
+        Route::post('/profile', 'update')->name('update');
     });

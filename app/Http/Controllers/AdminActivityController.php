@@ -7,6 +7,8 @@ use App\Models\Activity;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ActivityUpdatesExport;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdminActivityController extends Controller
 {
@@ -16,17 +18,29 @@ class AdminActivityController extends Controller
     public function index()
     {
 
-        $activities = Activity::with('updates.user')->get();
+        $activities = Activity::all();
+
         return view('dashboard.admins.activities.index', compact('activities'));
     }
 
 
-    public function download()
+    /**
+     * Download all activity updates as an Excel file.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function download( string $id )
     {
-        return Excel::download(new ActivityUpdatesExport, 'activity_updates.xlsx');
+        return Excel::download(new ActivityUpdatesExport($id), now() . 'activity_updates.xlsx');
     }
 
-    public function report(Request $request)
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function filter(Request $request)
     {
 
         $startDate = Carbon::parse($request->input('start_date'));
@@ -39,47 +53,77 @@ class AdminActivityController extends Controller
         return view('dashboard.admins.activities.report', compact('activities', 'startDate', 'endDate'));
     }
 
+    
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
+        try {
+            $validatedActivityData = $request->validate([
+                'description' => 'required|string|max:255',
+            ]);
 
-        // Validate the request
-        $validatedData = $request->validate([
-            'description' => 'required|string|max:255',
-        ]);
+            $data = [
+                'description' => $validatedActivityData['description'] ?? '',
+                'created_by' => $request->user()->id,
+                
+            ];
 
-        // Create a new activity
-        $activity = new Activity();
-        $activity->description = $validatedData['description'];
-        $activity->save();
+            $activity = Activity::create($data);
 
-        // Redirect back to the previous page with a success message
-        return redirect()->back()->with('success', 'Activity added successfully!');
+            if (!$activity) {
+                throw new \Exception('Failed to save activity');
+            }
+
+            return redirect()->back()->with('success', 'Activity added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
      * Display the specified resource.
+     *
+     * @param  string  $id
      */
     public function show(string $id)
     {
-        //
+        $activities = Activity::find($id);
+
+        return view('dashboard.admins.activities.show', 
+        ['activities' => $activities], );
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        
     }
+
+
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(string $id)
+    public function destroy(string $activityId): RedirectResponse
     {
-        //
+        try {
+            $activity = Activity::findOrFail($activityId);
+            $activity->delete();
+
+            return redirect()->back()->with('success', 'Activity deleted successfully!');
+        } catch (ModelNotFoundException $exception) {
+            return redirect()->back()->with('error', 'Activity not found');
+        }
     }
 }

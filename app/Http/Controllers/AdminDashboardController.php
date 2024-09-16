@@ -2,9 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Admin;
+use App\Models\Roles;
+use App\Models\Activity;
+use App\Exports\AdminExport;
+use App\Exports\UsersExport;
+use Illuminate\Http\Request;
+use App\Enums\Roles as RoleEnum;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdminDashboardController extends Controller
 {
@@ -87,9 +98,88 @@ class AdminDashboardController extends Controller
         ];
     }
 
+    /**
+     * Display a listing of all users (both regular users and admins).
+     *
+     */
     public function users()
     {
-        $allUsers = [...\App\Models\User::all(), ...\App\Models\Admin::all()];
-        return view('dashboard.admins.users.index', ['users' => $allUsers]);
+        $allUsers = [...User::all(), ...Admin::all()];
+        return view(
+            'dashboard.admins.users.index',
+            [
+                'users' => $allUsers,
+                'roles' => Roles::all()
+            ]
+        );
+    }
+
+    public function exportUsers()
+    {
+        return Excel::download(new UsersExport, now() . 'users.xlsx');
+    }
+
+    /**
+     * Export all admins to an Excel file.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportAdmins()
+    {
+        return Excel::download(new AdminExport, now() . 'admins.xlsx');
+    }
+
+    public function createUser(Request $request): RedirectResponse
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'role' => 'required|string|max:255',
+            ]);
+
+            $role = RoleEnum::getRoleIdByValue($validated['role']);
+
+            $data = [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'role_id' => $role,
+                'created_by' => $request->user()->id,
+            ];
+
+            if ($validated['role'] == RoleEnum::ADMIN->value) {
+                Admin::create($data);
+                return redirect()->back()->with('success', 'Admin created successfully');
+            }
+
+            User::create($data);
+
+            return redirect()->back()->with('success', 'User created successfully');
+        } catch (ValidationException $e) {
+            return redirect()->back()->with('error', $e->errors())->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete the specified user.
+     *
+     * @param int $userId
+     * @return RedirectResponse
+     */
+    public function deleteUser(int $userId): RedirectResponse
+    {
+        try {
+            $user = User::findOrFail($userId) ?? Admin::findOrFail($userId);
+
+            $user->delete();
+
+            return redirect()->back()->with('success', 'User deleted successfully');
+        } catch (ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'User not found');
+        }
     }
 }

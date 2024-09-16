@@ -16,6 +16,7 @@ class Activity extends Model
      */
     protected $fillable = [
         'description',
+        'created_by',
     ];
 
     /**
@@ -28,6 +29,6 @@ class Activity extends Model
 
     public function createdByUser()
     {
-        return $this->belongsTo(User::class, 'createdBy', 'id');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }
