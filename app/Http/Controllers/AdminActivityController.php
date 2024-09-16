@@ -20,7 +20,8 @@ class AdminActivityController extends Controller
 
         $activities = Activity::all();
 
-        return view('dashboard.admins.activities.index', compact('activities'));
+        return view('dashboard.admins.activities.index', 
+        ['activities' => $activities]);
     }
 
 

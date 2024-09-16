@@ -97,11 +97,11 @@ Route::controller(AdminActivityController::class)
     });
 
 
-Route::controller(controller: AdminProfileController::class)
+Route::controller( AdminProfileController::class)
     ->middleware([AdminAuthMiddleware::class])
     ->name('admin.dashboard.profile.')
     ->prefix('admin/dashboard')
     ->group(function () {
         Route::get('/profile', 'index')->name('index');
-        Route::post('/profile', 'update')->name('update');
+        Route::post('/profile/update', 'update')->name('update');
     });
