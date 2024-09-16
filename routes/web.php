@@ -28,6 +28,15 @@ Route::controller(AuthController::class)
         Route::get('/admin/logout', 'adminLogout')->name('adminLogout');
     });
 
+ Route::controller(AuthController::class) 
+    ->name('account.recovery.') 
+    ->group(function () {
+        Route::get('/admin/account-recovery', 'adminAccountRecoveryGet')->name(name: 'admin.get');
+        Route::post('/admin/account-recovery', 'adminAccountRecoveryPost')->name('admin.post');
+
+        Route::get('/user/account-recovery', 'userAccountRecoveryGet')->name(name: 'user.get');
+        Route::post('/user-d/account-recovery', 'userAccountRecoveryPost')->name('user.post');
+    });
 
 Route::controller(UsersDashboardController::class)
     ->middleware([UserAuthMiddleware::class])
