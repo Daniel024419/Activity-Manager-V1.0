@@ -14,18 +14,28 @@
             <div class="input-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" value="{{ old('email') }}" required>
-                <small>Error message</small>
+                <small>{{ $errors->first('email') }}</small>
             </div>
 
             <!-- Password Field -->
             <div class="input-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
-                <small>Error message</small>
+                <small>{{ $errors->first('password') }}</small>
+            </div>
+
+            <!-- Remember Me Field -->
+            <div class="form-check mb-3" style="padding-bottom: 10px">
+                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                <label class="form-check-label" for="remember">
+                    Remember Me
+                </label>
             </div>
 
             <!-- Submit Button -->
             <button type="submit">Login</button>
+
+            <center style="padding: 10px"><a href="{{ route('account.recovery.user.get') }}">Forgot Password?</a></center>
 
             <!-- Error Messages -->
             @if ($errors->any())

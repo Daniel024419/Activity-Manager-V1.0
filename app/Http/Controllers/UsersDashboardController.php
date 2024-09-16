@@ -30,7 +30,7 @@ class UsersDashboardController extends Controller
 
         // Group updates by day
         $updatesByDay = $updates->groupBy(function ($date) {
-            return \Carbon\Carbon::parse($date->manual_updated_at)->format('l'); // grouping by days of the week
+            return \Carbon\Carbon::parse($date->created_at)->format('l'); // grouping by days of the week
         });
 
         $smsCounts = $updatesByDay->map->count();
