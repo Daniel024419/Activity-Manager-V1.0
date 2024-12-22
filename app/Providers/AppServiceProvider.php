@@ -23,10 +23,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        if (config('app.env') === 'production') {
+        if (config('app.env') === 'production' || env('APP_ENV') === 'production') {
+
             URL::forceScheme('https');
         }
         // Share notifications across the app
-        //View::share('notifications', Notifications::latest()->get());
+        View::share('notifications', Notifications::latest()->get());
     }
 }
