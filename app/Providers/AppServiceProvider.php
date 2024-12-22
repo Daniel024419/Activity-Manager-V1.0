@@ -27,6 +27,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
         // Share notifications across the app
-        View::share('notifications', Notifications::latest()->get());
+        //View::share('notifications', Notifications::latest()->get());
     }
 }
